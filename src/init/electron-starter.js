@@ -16,12 +16,12 @@ function createMenuBar () {
     slashes: true
   });
 
-
   mb.on('after-create-window', () => {
     mb.window.loadURL(startUrl);
 
     if (debug == true) { 
       const size = mb.window.getSize();
+      // title bar is 20px
       createDebuggingWindow({height: size[0]+20, width: size[1], startUrl: startUrl});
     }
 
