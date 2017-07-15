@@ -69,7 +69,7 @@ export default {
 
   fetchAllTasks: () => {
     const result = [];
-    const allTasks = JSON.parse(localStorage.getItem(taskCollectionKey));
+    const allTasks = JSON.parse(localStorage.getItem(taskCollectionKey)) || [];
 
     allTasks.forEach((task) => {
       result.push(

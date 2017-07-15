@@ -153,17 +153,26 @@ describe('.remove', () => {
 });
 
 describe('.fetchAllTasks', () => {
-  beforeEach(() => {
+  it('returns those tasks from local storage', () => {
     TaskService.add(itemName);
     TaskService.add('bar');
-  });
 
-  it('returns those tasks from local storage', () => {
     const tasks = TaskService.fetchAllTasks();
     expect(tasks).toEqual(expect.arrayContaining([
       { name: itemName, totalElapsedTime: 0 },
       { name: 'bar', totalElapsedTime: 0 }
     ]));
+  });
+
+  it('returns those tasks from local storage', () => {
+    const tasks = TaskService.fetchAllTasks();
+    expect(tasks).toEqual([]);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(itemName);
+    localStorage.removeItem('bar');
+    localStorage.removeItem(TaskService.taskCollectionKey);
   });
 });
 

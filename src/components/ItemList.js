@@ -19,7 +19,7 @@ class ItemList extends Component {
       let newTasks = this.state.tasks;
       newTasks.push(task);
       this.setState({ tasks: newTasks });
-    }
+    } else alert(`${taskName} has already been added!`);
   }
 
   handleTaskDelete = (event) => {
@@ -31,7 +31,7 @@ class ItemList extends Component {
     let newState = { selectedTask: event.target.value };
 
     if (this.state.startTime) {
-      const  totalElapsedTime = parseInt((new Date() - this.state.startTime)/1000, 10);
+      const totalElapsedTime = parseInt((new Date() - this.state.startTime)/1000, 10);
       let totalElapsed = 0;
 
       newState.tasks = this.state.tasks.map((task) => {
