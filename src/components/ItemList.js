@@ -1,49 +1,54 @@
 import React, { Component } from 'react';
 import TaskAdder from './TaskAdder';
+import TaskService from '../services/TaskService';
 
 class ItemList extends Component {
   constructor() {
     super();
     this.state = {
       selectedTask: null,
-      tasks: [{name: "foo", elapsedTime: 0}],
-      logs: [],
+      tasks: TaskService.fetchAllTasks(),
       startTime: null,
       endTime: null
-    };
+    }
   }
 
   addTask = (taskName) => {
-    let newTasks = this.state.tasks;
-    newTasks.push({name: taskName, elapsedTime: 0});
-    this.setState({
-      tasks: newTasks
-    });
+    const task = TaskService.add(taskName);
+    if(task) {
+      let newTasks = this.state.tasks;
+      newTasks.push(task);
+      this.setState({ tasks: newTasks });
+    }
   }
 
-  handleTaskChange = (changeEvent) => {
-    let newState = { selectedTask: changeEvent.target.value };
+  handleTaskDelete = (event) => {
+    event.preventDefault();
+    this.clearTasks();
+  }
+
+  handleTaskChange = (event) => {
+    let newState = { selectedTask: event.target.value };
 
     if (this.state.startTime) {
-      const  elapsedTime = parseInt((new Date() - this.state.startTime)/1000, 10);
+      const  totalElapsedTime = parseInt((new Date() - this.state.startTime)/1000, 10);
       let totalElapsed = 0;
 
       newState.tasks = this.state.tasks.map((task) => {
         if (task.name === this.state.selectedTask) {
-          totalElapsed = task.elapsedTime + elapsedTime
-          return { name: task.name, elapsedTime: totalElapsed }
+          totalElapsed = task.totalElapsedTime + totalElapsedTime
+          return { name: task.name, totalElapsedTime: totalElapsed }
         } else return task
       });
-
-      newState.logs = this.state.logs;
-      newState.logs.push(
-        `${this.state.selectedTask}: current elapsed ${elapsedTime}, total elapsed ${totalElapsed}`
-      );
     }
 
     newState.startTime = new Date();
 
     this.setState(newState);
+  }
+
+  clearTasks = () => {
+    this.setState({selectedTask: null});
   }
 
   render() {
@@ -58,12 +63,6 @@ class ItemList extends Component {
       </div>
     );
 
-    const logs = this.state.logs.map((log) =>
-      <div key={log}>
-        {log}
-      </div>
-    );
-
     return (
       <div>
         <TaskAdder addTask={this.addTask} />
@@ -71,7 +70,7 @@ class ItemList extends Component {
           {tasks}
         </div>
         <div>
-          {logs}
+          <button onClick={this.handleTaskDelete}>Clear Events</button>
         </div>
       </div>
     );

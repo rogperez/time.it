@@ -5,7 +5,7 @@ const menubar = require('menubar')
 
 let win;
 let mb = menubar();
-let debug = true;
+let debug = false;
 
 mb.on('ready', createMenuBar);
 
