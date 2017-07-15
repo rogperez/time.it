@@ -1,5 +1,6 @@
 import TaskService from './TaskService';
 import {LocalStorage as NodeLocalStorage} from 'node-localstorage';
+import MockDate from 'mockdate';
 
 /* Set up localstorage in node context */
 let localStorage = new NodeLocalStorage('./scratch');
@@ -11,7 +12,10 @@ afterAll(() => {
 });
 
 const DEFAULT_ITEM_DATA_STRUCTURE = {
-  totalElapsedTime: 0
+  start: null,
+  end: null,
+  selected: false,
+  elapsedTime: 0
 };
 
 let itemName = 'foo';
@@ -74,39 +78,6 @@ describe('.add', () => {
   });
 });
 
-describe('.setElapsedTime', () => {
-  let time = 25;
-  let expectedItem = Object.assign(
-    {},
-    DEFAULT_ITEM_DATA_STRUCTURE,
-    { 
-      totalElapsedTime: time,
-      name: itemName
-    }
-  );
-
-  beforeEach(() => {
-    localStorage.setItem(itemName, JSON.stringify(
-      Object.assign({ name: itemName }, DEFAULT_ITEM_DATA_STRUCTURE)
-    ));
-  });
-
-  it('sets the time on that item', () => {
-    TaskService.setElapsedTime(itemName, time);
-    let actualItem = JSON.parse(localStorage.getItem(itemName));
-    expect(actualItem).toEqual(expectedItem);
-  });
-
-  it('returns the item data', () => {
-    expect(TaskService.setElapsedTime(itemName, time)).toEqual(expectedItem);
-  });
-
-  afterEach(() => {
-    localStorage.removeItem(itemName);
-    localStorage.removeItem(TaskService.taskCollectionKey);
-  });
-});
-
 describe('.remove', () => {
   beforeEach(() => {
     localStorage.setItem(itemName, 'bar');
@@ -159,8 +130,8 @@ describe('.fetchAllTasks', () => {
 
     const tasks = TaskService.fetchAllTasks();
     expect(tasks).toEqual(expect.arrayContaining([
-      { name: itemName, totalElapsedTime: 0 },
-      { name: 'bar', totalElapsedTime: 0 }
+      Object.assign({ name: itemName }, DEFAULT_ITEM_DATA_STRUCTURE),
+      Object.assign({ name: 'bar' }, DEFAULT_ITEM_DATA_STRUCTURE),
     ]));
   });
 
@@ -174,6 +145,149 @@ describe('.fetchAllTasks', () => {
     localStorage.removeItem('bar');
     localStorage.removeItem(TaskService.taskCollectionKey);
   });
+});
+
+describe('.setAttribute', () => {
+  let date;
+
+  beforeEach(() => {
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign({ name: itemName }, DEFAULT_ITEM_DATA_STRUCTURE)
+    ));
+
+    date = new Date(1988, 10, 19);
+    MockDate.set(date)
+  });
+
+  it('sets the time on that item, (defaulting to Date.now)', () => {
+    TaskService.setAttribute(itemName, 'start');
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName,
+          start: date.getTime()
+        }
+      )
+    );
+  });
+
+  it('sets the passed in time on start', () => {
+    TaskService.setAttribute(itemName, 'start', new Date());
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName,
+          start: date.getTime()
+        }
+      )
+    );
+  });
+
+  it('sets the passed in time on end', () => {
+    TaskService.setAttribute(itemName, 'end', new Date());
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName,
+          end: date.getTime()
+        }
+      )
+    );
+  });
+
+  it("returns false and doesn't modify localstorage item if date is not passed in", () => {
+    const setter = TaskService.setAttribute(itemName, 'end', 'foo');
+    expect(setter).toEqual(false);
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName
+        }
+      )
+    );
+  });
+
+  afterEach(() => {
+    MockDate.reset();
+    localStorage.removeItem(itemName);
+    localStorage.removeItem(TaskService.taskCollectionKey);
+  });
+});
+
+describe('.start', () => {
+  let date;
+
+  beforeEach(() => {
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign({ name: itemName }, DEFAULT_ITEM_DATA_STRUCTURE)
+    ));
+
+    date = new Date(1988, 10, 19);
+    MockDate.set(date)
+  });
+
+  it('sets the start time, selected true', () => {
+    TaskService.start(itemName);
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName,
+          start: date.getTime(),
+          selected: true
+        }
+      )
+    );
+  });
+
+  it('sets the end time, selected false', () => {
+    const beginningDate = new Date(2017, 0, 1);
+    MockDate.set(beginningDate);
+
+    TaskService.start(itemName);
+
+    const endingDate = new Date(2017, 0, 2);
+    MockDate.set(endingDate);
+
+    TaskService.stop(itemName);
+
+    const elapsedTime = endingDate - beginningDate;
+
+    let actualItem = JSON.parse(localStorage.getItem(itemName));
+    expect(actualItem).toEqual(
+      Object.assign(
+        {},
+        DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: itemName,
+          elapsedTime: elapsedTime,
+          start: beginningDate.getTime(),
+          end: endingDate.getTime(),
+          selected: false
+        }
+      )
+    );
+  });
+
 });
 
 

@@ -6,10 +6,7 @@ class ItemList extends Component {
   constructor() {
     super();
     this.state = {
-      selectedTask: null,
-      tasks: TaskService.fetchAllTasks(),
-      startTime: null,
-      endTime: null
+      tasks: TaskService.fetchAllTasks()
     }
   }
 
@@ -28,23 +25,15 @@ class ItemList extends Component {
   }
 
   handleTaskChange = (event) => {
-    let newState = { selectedTask: event.target.value };
-
-    if (this.state.startTime) {
-      const totalElapsedTime = parseInt((new Date() - this.state.startTime)/1000, 10);
-      let totalElapsed = 0;
-
-      newState.tasks = this.state.tasks.map((task) => {
-        if (task.name === this.state.selectedTask) {
-          totalElapsed = task.totalElapsedTime + totalElapsedTime
-          return { name: task.name, totalElapsedTime: totalElapsed }
-        } else return task
-      });
+    if(event.target.checked) {
+      TaskService.start(event.target.value);
+    } else {
+      TaskService.stop(event.target.value);
     }
 
-    newState.startTime = new Date();
-
-    this.setState(newState);
+    this.setState({
+      tasks: TaskService.fetchAllTasks()
+    });
   }
 
   clearTasks = () => {
@@ -55,9 +44,9 @@ class ItemList extends Component {
     const tasks = this.state.tasks.map((task) =>
       <div key={task.name}>
         <label>
-          <input type="radio" value={task.name} 
+          <input type="checkbox" value={task.name} 
             onChange={this.handleTaskChange}
-            checked={this.state.selectedTask===task.name} />
+            checked={task.selected} />
           {task.name}
         </label>
       </div>
@@ -70,7 +59,7 @@ class ItemList extends Component {
           {tasks}
         </div>
         <div>
-          <button onClick={this.handleTaskDelete}>Clear Events</button>
+          <button onClick={this.handleTaskDelete}>Stop All Items</button>
         </div>
       </div>
     );

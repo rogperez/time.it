@@ -1,19 +1,25 @@
 import AdditionalUtils from '../util/AdditionalUtils';
 
 const DEFAULT_ITEM_DATA = {
-  totalElapsedTime: 0
+  elapsedTime: 0,
+  start: null,
+  end: null,
+  selected: false
 };
 
 const taskCollectionKey = 
   AdditionalUtils.stringToHashCode('Kanye West');
 
+const getAllTasks = () => {
+  return JSON.parse(
+    localStorage.getItem(
+      taskCollectionKey
+    ) || '[]'
+  );
+};
+
 const addToTaskArray = (itemName) => {
-  const allTasks = 
-    JSON.parse(
-      localStorage.getItem(
-        taskCollectionKey
-      ) || '[]'
-    );
+  const allTasks = getAllTasks();
 
   allTasks.push(itemName);
 
@@ -24,12 +30,7 @@ const addToTaskArray = (itemName) => {
 };
 
 const removeFromTaskArray = (itemName) => {
-  const allTasks = 
-    JSON.parse(
-      localStorage.getItem(
-        taskCollectionKey
-      ) || '[]'
-    );
+  const allTasks = getAllTasks();
 
   const filteredTasks = 
     allTasks.filter(task => task !== itemName)
@@ -39,6 +40,30 @@ const removeFromTaskArray = (itemName) => {
     JSON.stringify(filteredTasks)
   );
 }
+
+const setAttribute = (itemName, attribute, value=new Date()) => {
+  const itemFromStorage = getItemFromStorage(itemName);
+
+  if(['start', 'end'].includes(attribute)) {
+    if(!(value instanceof Date)) {
+      console.error('Date was not passed in. Cannot set this date');
+      return false;
+    }
+    itemFromStorage[attribute] = value.getTime();
+  } else {
+    itemFromStorage[attribute] = value;
+  }
+
+
+  localStorage.setItem(itemName, JSON.stringify(itemFromStorage));
+  return itemFromStorage;
+};
+
+const getItemFromStorage = (itemName) => {
+  return JSON.parse(
+    localStorage.getItem(itemName)
+  );
+};
 
 export default {
   taskCollectionKey,
@@ -52,13 +77,6 @@ export default {
     addToTaskArray(itemName);
 
     return Object.assign({ name: itemName }, DEFAULT_ITEM_DATA);
-  },
-
-  setElapsedTime: (itemName, time) => {
-    const itemFromStorage = JSON.parse(localStorage.getItem(itemName));
-    itemFromStorage.totalElapsedTime = time;
-    localStorage.setItem(itemName, JSON.stringify(itemFromStorage));
-    return itemFromStorage;
   },
 
   remove: (itemName) => {
@@ -80,5 +98,22 @@ export default {
     });
 
     return result;
-  }
+  },
+
+  setAttribute,
+
+  start: (itemName) => {
+    setAttribute(itemName, 'selected', true);
+    return setAttribute(itemName, 'start');
+  },
+
+  stop: (itemName) => {
+    setAttribute(itemName, 'selected', false);
+    const item = setAttribute(itemName, 'end');
+    return setAttribute(
+      itemName,
+      'elapsedTime',
+      item.elapsedTime + item.end - item.start
+    )
+  } 
 }

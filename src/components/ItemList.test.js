@@ -12,10 +12,7 @@ describe('#constructor', () => {
 
     expect(itemList.state).toEqual(
       {
-        selectedTask: null,
-        tasks: [],
-        startTime: null,
-        endTime: null
+        tasks: []
       }
     );
   });
