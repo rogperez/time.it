@@ -123,8 +123,8 @@ export default {
 
   stopAllTasks: () => {
     const allTasks = fetchAllTasks();
-    allTasks.
-      filter(task => task.selected).
-      forEach(task => stop(task.name));
+    allTasks
+      .filter(task => task.selected)
+      .forEach(task => stop(task.name));
   }
 }
