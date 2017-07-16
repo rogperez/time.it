@@ -288,6 +288,100 @@ describe('.start', () => {
     );
   });
 
+  afterEach(() => {
+    MockDate.reset();
+    localStorage.removeItem(itemName);
+    localStorage.removeItem(TaskService.taskCollectionKey);
+  });
+});
+
+describe('.stopAllTasks', () => {
+  let startDate, endDate;
+
+  beforeEach(() => {
+    startDate = new Date(1988, 10, 19);
+    MockDate.set(startDate)
+
+    TaskService.add('foo');
+    TaskService.add('bar');
+    TaskService.add('baz');
+
+    TaskService.start('foo');
+    TaskService.start('baz');
+  });
+
+  it('stops only selected tasks', () => {
+    let getItem = (item) => { 
+      return JSON.parse(localStorage.getItem(item))
+    }
+
+    expect(getItem('foo')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'foo',
+          start: startDate.getTime(),
+          selected: true
+        }
+      )
+    );
+    expect(getItem('bar')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'bar',
+          selected: false,
+          start: null
+        }
+      )
+    );
+    expect(getItem('baz')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'baz',
+          selected: true,
+          start: startDate.getTime()
+        }
+      )
+    );
+
+
+    endDate = new Date(1988, 10, 20);
+    MockDate.set(endDate)
+
+    TaskService.stopAllTasks();
+
+    const elapsedTime = endDate - startDate;
+    expect(getItem('foo')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'foo',
+          start: startDate.getTime(),
+          end: endDate.getTime(),
+          elapsedTime: elapsedTime,
+          selected: false
+        }
+      )
+    );
+    expect(getItem('bar')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'bar',
+          selected: false,
+          start: null
+        }
+      )
+    );
+    expect(getItem('baz')).toEqual(
+      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
+        {
+          name: 'baz',
+          selected: false,
+          start: startDate.getTime(),
+          end: endDate.getTime(),
+          elapsedTime: elapsedTime
+        }
+      )
+    );
+  });
 });
 
 

@@ -65,6 +65,31 @@ const getItemFromStorage = (itemName) => {
   );
 };
 
+const stop = (itemName) => {
+  setAttribute(itemName, 'selected', false);
+  const item = setAttribute(itemName, 'end');
+  return setAttribute(
+    itemName,
+    'elapsedTime',
+    item.elapsedTime + item.end - item.start
+  )
+}
+
+const fetchAllTasks = () => {
+  const result = [];
+  const allTasks = JSON.parse(localStorage.getItem(taskCollectionKey)) || [];
+
+  allTasks.forEach((task) => {
+    result.push(
+      JSON.parse(
+        localStorage.getItem(task)
+      )
+    );
+  });
+
+  return result;
+};
+
 export default {
   taskCollectionKey,
 
@@ -85,20 +110,7 @@ export default {
     return true;
   },
 
-  fetchAllTasks: () => {
-    const result = [];
-    const allTasks = JSON.parse(localStorage.getItem(taskCollectionKey)) || [];
-
-    allTasks.forEach((task) => {
-      result.push(
-        JSON.parse(
-          localStorage.getItem(task)
-        )
-      );
-    });
-
-    return result;
-  },
+  fetchAllTasks,
 
   setAttribute,
 
@@ -107,13 +119,12 @@ export default {
     return setAttribute(itemName, 'start');
   },
 
-  stop: (itemName) => {
-    setAttribute(itemName, 'selected', false);
-    const item = setAttribute(itemName, 'end');
-    return setAttribute(
-      itemName,
-      'elapsedTime',
-      item.elapsedTime + item.end - item.start
-    )
-  } 
+  stop,
+
+  stopAllTasks: () => {
+    const allTasks = fetchAllTasks();
+    allTasks.
+      filter(task => task.selected).
+      forEach(task => stop(task.name));
+  }
 }

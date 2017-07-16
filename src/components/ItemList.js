@@ -24,6 +24,11 @@ class ItemList extends Component {
     this.clearTasks();
   }
 
+  handleStopAll = () => {
+    TaskService.stopAllTasks();
+    this.setState({tasks: TaskService.fetchAllTasks()});
+  }
+
   handleTaskChange = (event) => {
     if(event.target.checked) {
       TaskService.start(event.target.value);
@@ -59,7 +64,7 @@ class ItemList extends Component {
           {tasks}
         </div>
         <div>
-          <button onClick={this.handleTaskDelete}>Stop All Items</button>
+          <button onClick={this.handleStopAll}>Stop All Items</button>
         </div>
       </div>
     );
