@@ -14,11 +14,13 @@ class ItemList extends Component {
 
   addTask = (taskName) => {
     const task = TaskService.add(taskName);
-    if(task) {
+    if(task.created) {
       let newTasks = this.state.tasks;
       newTasks.push(task);
       this.setState({ tasks: newTasks });
-    } else alert(`${taskName} has already been added!`);
+    } else {
+      alert(`Dang! ${task.errorMessage}`);
+    }
   }
 
   handleTaskDelete = (event) => {

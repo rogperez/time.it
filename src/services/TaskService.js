@@ -7,6 +7,10 @@ const DEFAULT_ITEM_DATA = {
   selected: false
 };
 
+const createErrorObject = (errorMessage) => {
+  return { created: false, errorMessage };
+};
+
 const taskCollectionKey = 
   AdditionalUtils.stringToHashCode('Kanye West');
 
@@ -99,8 +103,12 @@ export default {
   },
 
   add: (itemName) => {
-    if(itemName === '' || localStorage.getItem(itemName)) return false;
-
+    if(itemName === '') {
+      return createErrorObject('Your task has to have a name!');
+    }
+    if(localStorage.getItem(itemName)) {
+      return createErrorObject('That task already exists...');
+    }
     localStorage.setItem(itemName, JSON.stringify(
       Object.assign({ name: itemName }, DEFAULT_ITEM_DATA)
     ));

@@ -21,6 +21,17 @@ const DEFAULT_ITEM_DATA_STRUCTURE = {
 let itemName = 'foo';
 
 describe('.add', () => {
+  describe('when taskname is empty', () => {
+    it('cannot add that item', () => {
+      const task = TaskService.add('');
+      expect(task.created).toBeFalsey;
+    });
+
+    it('has returns an object with an error message', () => {
+      const task = TaskService.add('');
+      expect(task.errorMessage).toEqual('Your task has to have a name!');
+    });
+  });
   describe('when TaskService already contains that item', () => {
     beforeEach(() => {
       const actualValue = 'bar';
@@ -28,13 +39,19 @@ describe('.add', () => {
     });
 
     it('cannot add that item', () => {
-      expect(TaskService.add(itemName)).toBeFalsey;
+      const task = TaskService.add(itemName);
+      expect(task.created).toBeFalsey;
+    });
+
+    it('cannot add that item', () => {
+      const task = TaskService.add(itemName);
+      expect(task.errorMessage).toEqual('That task already exists...');
     });
 
     it('does not reassign foo', () => {
-      const unepectedValue = 'not this';
-      TaskService.add(itemName, unepectedValue);
-      expect(localStorage.getItem(itemName)).not.toEqual(unepectedValue);
+      const unexpectedValue = 'not this';
+      TaskService.add(itemName, unexpectedValue);
+      expect(localStorage.getItem(itemName)).not.toEqual(unexpectedValue);
     });
   });
 
