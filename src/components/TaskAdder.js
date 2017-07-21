@@ -12,10 +12,10 @@ class TaskAdder extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    if(this.state.value === '') return;
     this.setState({value: ''});
     this.props.addTask(this.state.value);
   }
-
 
   render() {
     return (

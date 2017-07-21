@@ -30,9 +30,7 @@ $checked-text: '😃';
   100% { @include transform(rotate(360deg)) }
 }
 
-
 .row {
-  padding: 10px;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -41,6 +39,7 @@ $checked-text: '😃';
 
 .item-row {
   height: $row-height;
+  margin: 10px 0px;
   
   .title {}
   
@@ -49,7 +48,6 @@ $checked-text: '😃';
   }
 
   .fancy-checkbox {
-    margin: 0 30px;
     height: 100%;
     max-width: $row-height;
     min-width: $row-height;
