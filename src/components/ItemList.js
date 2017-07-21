@@ -57,7 +57,7 @@ class ItemList extends Component {
             value={task.name}
             type="checkbox"
             onChange={this.handleTaskChange}
-            defaultChecked={task.selected} />
+            checked={task.selected} />
           <label htmlFor={task.name}>
             <span className="spinner"></span>
             <span className="text"></span>

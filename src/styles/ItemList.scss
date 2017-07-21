@@ -1,9 +1,15 @@
-//@mixin keyframes($name) {
-//  @-webkit-keyframes #{$name} { @content; }
-//  @-moz-keyframes #{$name} { @content; }
-//  @-ms-keyframes #{$name} { @content; }
-//  @keyframes #{$name} { @content; } 
-//}
+$row-height: 40px;
+$fancy-checkbox-active-border: 3px dotted #DDD;
+$fancy-checkbox-font-size: 1.3em;
+$unchecked-text: '😴';
+$checked-text: '😃';
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} { @content; }
+  @-moz-keyframes #{$name} { @content; }
+  @-ms-keyframes #{$name} { @content; }
+  @keyframes #{$name} { @content; } 
+}
 
 @mixin animation($prop) {
   -webkit-animation: $prop;
@@ -11,10 +17,6 @@
   -o-animation: $prop;
   animation: $prop;
 }
-
-//@include keyframes(rotate) {
-//  100% { @include transform(rotate(360deg)) }
-//}
 
 @mixin transform($transforms) {
      -moz-transform: $transforms;
@@ -24,18 +26,21 @@
           transform: $transforms;
 }
 
+@include keyframes(rotate) {
+  100% { @include transform(rotate(360deg)) }
+}
+
+
 .row {
   padding: 10px;
   display: flex;
   align-items: center;
   flex-direction: row;
   width: 100%;
-  // border: 1px solid black;
-  // border-top: 0px;
 }
 
 .item-row {
-  height: 60px;
+  height: $row-height;
   
   .title {}
   
@@ -46,8 +51,9 @@
   .fancy-checkbox {
     margin: 0 30px;
     height: 100%;
-    max-width: 60px;
-    min-width: 60px;
+    max-width: $row-height;
+    min-width: $row-height;
+    font-size: $fancy-checkbox-font-size;
 
     label {
       display: flex;
@@ -65,7 +71,7 @@
         color: white;
         
         &:after {
-          content: 'start';
+          content: $unchecked-text;
         }
       }
 
@@ -87,14 +93,14 @@
         box-sizing: border-box;
         height: 100%;
         width: 100%;
-        border: 2px dotted #DDD;
+        border: $fancy-checkbox-active-border;
         border-radius: 100px;
         background-color: rgba(0,0,0,0);
         @include animation(rotate 8s linear infinite);
       }
       
       .text:after {
-        content: 'pause';
+        content: $checked-text;
       }
     }
 
