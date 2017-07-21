@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TaskAdder from './TaskAdder';
 import TaskService from '../services/TaskService';
+import '../styles/ItemList.css';
 
 class ItemList extends Component {
   constructor() {
@@ -47,13 +48,21 @@ class ItemList extends Component {
 
   render() {
     const tasks = this.state.tasks.map((task) =>
-      <div key={task.name}>
-        <label>
-          <input type="checkbox" value={task.name} 
+      <div key={task.name} className="row item-row">
+        <span className="title">{task.name}</span>
+        <span className="filler"></span>
+        <div className="fancy-checkbox">
+          <input
+            id={task.name}
+            value={task.name}
+            type="checkbox"
             onChange={this.handleTaskChange}
-            checked={task.selected} />
-          {task.name}
-        </label>
+            defaultChecked={task.selected} />
+          <label htmlFor={task.name}>
+            <span className="spinner"></span>
+            <span className="text"></span>
+          </label>
+        </div>
       </div>
     );
 

@@ -1,0 +1,107 @@
+//@mixin keyframes($name) {
+//  @-webkit-keyframes #{$name} { @content; }
+//  @-moz-keyframes #{$name} { @content; }
+//  @-ms-keyframes #{$name} { @content; }
+//  @keyframes #{$name} { @content; } 
+//}
+
+@mixin animation($prop) {
+  -webkit-animation: $prop;
+  -moz-animation: $prop;
+  -o-animation: $prop;
+  animation: $prop;
+}
+
+//@include keyframes(rotate) {
+//  100% { @include transform(rotate(360deg)) }
+//}
+
+@mixin transform($transforms) {
+     -moz-transform: $transforms;
+       -o-transform: $transforms;
+      -ms-transform: $transforms;
+  -webkit-transform: $transforms;
+          transform: $transforms;
+}
+
+.row {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  // border: 1px solid black;
+  // border-top: 0px;
+}
+
+.item-row {
+  height: 60px;
+  
+  .title {}
+  
+  .filler {
+    flex-grow: 1;
+  }
+
+  .fancy-checkbox {
+    margin: 0 30px;
+    height: 100%;
+    max-width: 60px;
+    min-width: 60px;
+
+    label {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      border-radius: 100px;
+      background-color: #124559;
+      justify-content: center;
+      cursor: pointer;
+      
+      .text {
+        position: absolute;
+        color: white;
+        
+        &:after {
+          content: 'start';
+        }
+      }
+
+      &:after {
+        transform-origin: 50% 50%;
+        @include transform(translate(50%, 100%));
+        display: block;
+        color: #FFF;
+      }
+      &:hover:after {
+        font-weight: 800;
+      }
+    }
+
+    input:checked + label {
+      background-color: #EF8354;
+      
+      .spinner {
+        box-sizing: border-box;
+        height: 100%;
+        width: 100%;
+        border: 2px dotted #DDD;
+        border-radius: 100px;
+        background-color: rgba(0,0,0,0);
+        @include animation(rotate 8s linear infinite);
+      }
+      
+      .text:after {
+        content: 'pause';
+      }
+    }
+
+    input { 
+      display: none;
+    }
+  }
+}
+
+
