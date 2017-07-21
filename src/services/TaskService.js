@@ -93,6 +93,11 @@ const fetchAllTasks = () => {
 export default {
   taskCollectionKey,
 
+  start: (itemName) => {
+    setAttribute(itemName, 'selected', true);
+    return setAttribute(itemName, 'start');
+  },
+
   add: (itemName) => {
     if(itemName === '' || localStorage.getItem(itemName)) return false;
 
@@ -110,21 +115,16 @@ export default {
     return true;
   },
 
-  fetchAllTasks,
-
-  setAttribute,
-
-  start: (itemName) => {
-    setAttribute(itemName, 'selected', true);
-    return setAttribute(itemName, 'start');
-  },
-
-  stop,
-
   stopAllTasks: () => {
     const allTasks = fetchAllTasks();
     allTasks
       .filter(task => task.selected)
       .forEach(task => stop(task.name));
-  }
+  },
+
+  fetchAllTasks,
+
+  setAttribute,
+
+  stop
 }
