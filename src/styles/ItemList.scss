@@ -1,4 +1,5 @@
 $row-height: 40px;
+$elapsed-time-row-height: 30px;
 $fancy-checkbox-active-border: 3px dotted #DDD;
 $fancy-checkbox-font-size: 1.3em;
 $unchecked-text: '😴';
@@ -41,7 +42,19 @@ $checked-text: '😃';
   height: $row-height;
   margin: 10px 0px;
   
-  .title {}
+  .title-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .title { } 
+
+    .elapsed-time {
+      height: $elapsed-time-row-height;
+      font-size: 0.7em;
+    }
+  }
   
   .filler {
     flex-grow: 1;
