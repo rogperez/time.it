@@ -79,6 +79,11 @@ const stop = (itemName) => {
   )
 }
 
+const start = (itemName) => {
+  setAttribute(itemName, 'selected', true);
+  return setAttribute(itemName, 'start');
+}
+
 const fetchAllTasks = () => {
   const result = [];
   const allTasks = JSON.parse(localStorage.getItem(taskCollectionKey)) || [];
@@ -94,13 +99,23 @@ const fetchAllTasks = () => {
   return result;
 };
 
+const refreshTaskTime = (itemName) => {
+  if(getItemFromStorage(itemName).start === null) {
+    return false;
+  }
+
+  if(getItemFromStorage(itemName).selected) {
+    stop(itemName);
+    start(itemName);
+  } else {
+    return false;
+  }
+};
+
 export default {
   taskCollectionKey,
 
-  start: (itemName) => {
-    setAttribute(itemName, 'selected', true);
-    return setAttribute(itemName, 'start');
-  },
+  start,
 
   add: (itemName) => {
     if(itemName === '') {
@@ -114,7 +129,7 @@ export default {
     ));
     addToTaskArray(itemName);
 
-    return Object.assign({ name: itemName }, DEFAULT_ITEM_DATA);
+    return Object.assign({ name: itemName, created: true }, DEFAULT_ITEM_DATA);
   },
 
   remove: (itemName) => {
@@ -128,6 +143,12 @@ export default {
     allTasks
       .filter(task => task.selected)
       .forEach(task => stop(task.name));
+  },
+
+  refreshTaskTime,
+
+  refreshAllTasks: () => {
+    fetchAllTasks().forEach(task => refreshTaskTime(task.name));
   },
 
   fetchAllTasks,

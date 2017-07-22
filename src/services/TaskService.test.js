@@ -82,7 +82,7 @@ describe('.add', () => {
       expect(TaskService.add(itemName)).
         toEqual(
           Object.assign(
-            { name: itemName },
+            { name: itemName, created: true },
             DEFAULT_ITEM_DATA_STRUCTURE
           )
         );
@@ -401,4 +401,118 @@ describe('.stopAllTasks', () => {
   });
 });
 
+describe('.refreshTaskTime', () => {
+  let startDate, endDate;
+
+  beforeEach(() => {
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign(
+        { name: itemName },
+        DEFAULT_ITEM_DATA_STRUCTURE
+      )
+    ));
+
+    startDate = new Date(2000, 0, 1);
+    endDate = new Date(2000, 0, 1, 4); // 4... hours... later...
+    MockDate.set(startDate)
+  });
+
+  describe('task has not yet started', () => {
+    it('returns false', () => {
+      expect(TaskService.refreshTaskTime(itemName))
+        .toBeFalsey;
+    });
+  });
+
+  describe('task has started', () => {
+    it('resets the elapsed and end times', () => {
+      TaskService.start(itemName);
+
+      MockDate.set(endDate);
+      TaskService.refreshTaskTime(itemName);
+
+      const item =
+        JSON.parse(localStorage.getItem(itemName));
+
+      expect(item.end)
+        .toEqual(endDate.getTime());
+      expect(item.start)
+        .toEqual(endDate.getTime());
+      expect(item.elapsedTime)
+        .toEqual(endDate.getTime() - startDate.getTime());
+    });
+
+    it('doesn\'t change dates if they\'re', () => {
+      TaskService.start(itemName);
+
+      MockDate.set(endDate);
+
+      TaskService.stop(itemName);
+
+      const thirdDate = new Date(2000, 0, 1, 8);
+      MockDate.set(thirdDate);
+      TaskService.refreshTaskTime(itemName);
+      
+      const item =
+        JSON.parse(localStorage.getItem(itemName));
+
+      expect(item.start).not.toEqual(thirdDate.getTime());
+      expect(item.end).not.toEqual(thirdDate.getTime());
+
+      expect(item.start).toEqual(startDate.getTime());
+      expect(item.end).toEqual(endDate.getTime());
+    });
+
+    it('doesn\'t mess with the selected property', () => {
+      const item = () => {
+        return JSON.parse(localStorage.getItem(itemName));
+      };
+
+      TaskService.start(itemName);
+
+      expect(item().selected).toEqual(true);
+
+      TaskService.refreshTaskTime(itemName);
+      
+      expect(item().selected).toEqual(true);
+    });
+  });
+
+  afterEach(() => {
+    MockDate.reset();
+    localStorage.removeItem(itemName);
+    localStorage.removeItem(TaskService.taskCollectionKey);
+  });
+});
+
+describe.only('.refreshAllTasks', () => {
+  let itemName2 = 'bar', startDate, endDate;
+
+  beforeEach(() => {
+    TaskService.add(itemName);
+    TaskService.add(itemName2);
+
+    startDate = new Date(2000, 0, 1);
+    endDate = new Date(2000, 0, 1, 4); // 4... hours... later...
+    MockDate.set(startDate)
+
+    TaskService.start(itemName);
+  });
+
+  it('refreshes started tasks', () => {
+    MockDate.set(endDate);
+
+    TaskService.refreshAllTasks();
+
+    const item =
+      JSON.parse(localStorage.getItem(itemName));
+    const item2 =
+      JSON.parse(localStorage.getItem(itemName2));
+
+    expect(item.elapsedTime)
+      .toEqual(endDate.getTime() - startDate.getTime());
+    expect(item2.elapsedTime)
+      .toEqual(0);
+  });
+});
 

@@ -2,13 +2,38 @@ import React, { Component } from 'react';
 import ElapsedTime from './ElapsedTime';
 
 class Task extends Component {
+  constructor() {
+    super();
+    // TODO: this will eventually be set via the preferences
+    this.state = {
+      showPreciseTime: false
+    };
+  }
+
+  handleMouseEnter = () => {
+    this.setState({ showPreciseTime: true });
+  }
+
+  handleMouseLeave = () => {
+    this.setState({ showPreciseTime: false });
+  }
+
   render() {
-    const { task, handleTaskChange } = this.props
+    const { task, handleTaskChange, handleTaskDelete } = this.props;
     return (
       <div className="row item-row">
-        <span className="title-wrapper">
-          <span className="title">{task.name}</span>
+        <span 
+          className="title-wrapper"
+          onMouseEnter={this.handleMouseEnter}
+          onMouseLeave={this.handleMouseLeave}>
+          <span className="title">
+            <span
+              className="delete-button"
+              onClick={ () => { handleTaskDelete(task.name) } }></span>
+            {task.name}
+          </span>
           <ElapsedTime 
+            showPreciseTime={this.state.showPreciseTime}
             elapsedTime={task.elapsedTime} />
         </span>
         <span className="filler"></span>

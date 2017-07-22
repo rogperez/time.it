@@ -48,7 +48,14 @@ $checked-text: '😃';
     flex-direction: column;
     justify-content: center;
 
-    .title { } 
+    &:hover { 
+      .delete-button:after {
+        cursor: pointer;
+        margin-right: 5px;
+        font-size: 0.8em;
+        content: '❌';
+      }
+    }
 
     .elapsed-time {
       height: $elapsed-time-row-height;

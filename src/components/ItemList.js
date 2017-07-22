@@ -12,6 +12,15 @@ class ItemList extends Component {
     }
   }
 
+  componentDidMount() {
+    setInterval(() => {
+      TaskService.refreshAllTasks();
+      this.setState({
+        tasks: TaskService.fetchAllTasks()
+      });
+    }, 1000);
+  }
+
   addTask = (taskName) => {
     const task = TaskService.add(taskName);
     if(task.created) {
@@ -23,9 +32,15 @@ class ItemList extends Component {
     }
   }
 
-  handleTaskDelete = (event) => {
-    event.preventDefault();
-    this.clearTasks();
+  handleTaskDelete = (taskName) => {
+    if(window.confirm(
+      `Are you sure you want to delete ${taskName}`
+    )) {
+      TaskService.remove(taskName);
+      this.setState({
+        tasks: TaskService.fetchAllTasks()
+      });
+    }
   }
 
   handleStopAll = () => {
@@ -45,13 +60,13 @@ class ItemList extends Component {
     });
   }
 
-  clearTasks = () => {
-    this.setState({selectedTask: null});
-  }
-
   render() {
     const tasks = this.state.tasks.map((task) =>
-      <Task key={task.name} task={task} handleTaskChange={this.handleTaskChange} />
+      <Task
+        key={task.name}
+        task={task}
+        handleTaskChange={this.handleTaskChange} 
+        handleTaskDelete={this.handleTaskDelete} />
     );
 
     return (
