@@ -60,14 +60,11 @@ class ItemList extends Component {
     });
   }
 
-  handleTaskEditName = (itemName) => {
-    const newName = prompt(`Renaming task ${itemName}`, itemName);
-    if(newName) {
-      if(TaskService.rename(itemName, newName)) {
-        this.setState({tasks: TaskService.fetchAllTasks()});
-      } else {
-        alert(`Can't. Task ${newName} already exists.`);
-      }
+  handleTaskEditName = (itemName, newName) => {
+    if(TaskService.rename(itemName, newName)) {
+      this.setState({tasks: TaskService.fetchAllTasks()});
+    } else {
+      alert(`Can't. Task ${newName} already exists.`);
     }
   }
 
@@ -76,9 +73,9 @@ class ItemList extends Component {
       <Task
         key={task.name}
         task={task}
-        handleTaskChange={this.handleTaskChange} 
-        handleTaskDelete={this.handleTaskDelete}
-        handleTaskEdit={this.handleTaskEditName} />
+        onTaskChange={this.handleTaskChange} 
+        onTaskDelete={this.handleTaskDelete}
+        onTaskEditName={this.handleTaskEditName} />
     );
 
     return (

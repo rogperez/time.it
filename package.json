@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "classnames": "^2.2.5",
     "font-awesome": "^4.7.0",
     "menubar": "^5.2.3",
     "moment": "^2.18.1",
