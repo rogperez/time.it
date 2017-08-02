@@ -485,7 +485,7 @@ describe('.refreshTaskTime', () => {
   });
 });
 
-describe.only('.refreshAllTasks', () => {
+describe('.refreshAllTasks', () => {
   let itemName2 = 'bar', startDate, endDate;
 
   beforeEach(() => {
@@ -513,6 +513,71 @@ describe.only('.refreshAllTasks', () => {
       .toEqual(endDate.getTime() - startDate.getTime());
     expect(item2.elapsedTime)
       .toEqual(0);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(itemName);
+    localStorage.removeItem(itemName2);
+    localStorage.removeItem(TaskService.taskCollectionKey);
+  });
+});
+
+describe('.edit', () => {
+  const allTasksArray = () => {
+    return JSON.parse(localStorage.getItem(
+      TaskService.taskCollectionKey
+    ));
+  };
+
+  beforeEach(() => {
+    TaskService.add('one');
+    TaskService.add('two');
+    TaskService.add('three');
+  });
+
+  it('renames it in the all tasks array and returns true', () => {
+    expect(allTasksArray()).toEqual([
+      'one', 'two', 'three'
+    ]);
+
+    const success = TaskService.rename('two', 'fish');
+
+    expect(success).toEqual(true);
+    expect(allTasksArray()).toEqual([
+      'one', 'fish', 'three'
+    ]);
+  });
+
+  it('returns false if there is already a task with that name', () => {
+    expect(allTasksArray()).toEqual([
+      'one', 'two', 'three'
+    ]);
+
+    const success = TaskService.rename('two', 'three');
+
+    expect(success).toEqual(false);
+    expect(allTasksArray()).toEqual([
+      'one', 'two', 'three'
+    ]);
+  });
+
+
+  it('renames the actual task', () => {
+    expect(localStorage.getItem('fish')).toEqual(null);
+    expect(localStorage.getItem('two')).not.toEqual(null);
+
+    TaskService.rename('two', 'fish');
+
+    expect(localStorage.getItem('two')).toEqual(null);
+    expect(localStorage.getItem('fish')).not.toEqual(null);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem('one');
+    localStorage.removeItem('two');
+    localStorage.removeItem('three');
+    localStorage.removeItem('fish');
+    localStorage.removeItem(TaskService.taskCollectionKey);
   });
 });
 

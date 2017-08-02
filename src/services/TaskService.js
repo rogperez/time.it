@@ -11,7 +11,7 @@ const createErrorObject = (errorMessage) => {
   return { created: false, errorMessage };
 };
 
-const taskCollectionKey = 
+const taskCollectionKey =
   AdditionalUtils.stringToHashCode('Kanye West');
 
 const getAllTasks = () => {
@@ -24,9 +24,11 @@ const getAllTasks = () => {
 
 const addToTaskArray = (itemName) => {
   const allTasks = getAllTasks();
-
   allTasks.push(itemName);
+  resetAllTasksArray(allTasks);
+};
 
+const resetAllTasksArray = (allTasks) => {
   localStorage.setItem(
     taskCollectionKey,
     JSON.stringify(allTasks)
@@ -36,7 +38,7 @@ const addToTaskArray = (itemName) => {
 const removeFromTaskArray = (itemName) => {
   const allTasks = getAllTasks();
 
-  const filteredTasks = 
+  const filteredTasks =
     allTasks.filter(task => task !== itemName)
 
   localStorage.setItem(
@@ -117,6 +119,14 @@ export default {
 
   start,
 
+  fetchAllTasks,
+
+  setAttribute,
+
+  stop,
+
+  refreshTaskTime,
+
   add: (itemName) => {
     if(itemName === '') {
       return createErrorObject('Your task has to have a name!');
@@ -145,15 +155,26 @@ export default {
       .forEach(task => stop(task.name));
   },
 
-  refreshTaskTime,
-
   refreshAllTasks: () => {
     fetchAllTasks().forEach(task => refreshTaskTime(task.name));
   },
 
-  fetchAllTasks,
+  rename: (itemName, newName) => {
+    const allTasks = JSON.parse(localStorage.getItem(
+      taskCollectionKey
+    ));
 
-  setAttribute,
+    if(allTasks.indexOf(newName) >= 0) return false;
 
-  stop
+    const indexOfTask = allTasks.indexOf(itemName);
+    allTasks[indexOfTask] = newName;
+    resetAllTasksArray(allTasks);
+
+    let oldItem = JSON.parse(localStorage.getItem(itemName));
+    oldItem.name = newName;
+    localStorage.removeItem(itemName);
+    localStorage.setItem(newName, JSON.stringify(oldItem));
+
+    return true;
+  }
 }

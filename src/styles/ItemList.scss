@@ -45,15 +45,21 @@ $checked-text: '😃';
   .title-wrapper {
     height: 100%;
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
     justify-content: center;
 
+    .hiding-button {
+      cursor: pointer;
+      display: none;
+      margin-left: 10px;
+      margin-right: 5px;
+      font-size: 1em;
+    }
+
     &:hover { 
-      .delete-button:after {
-        cursor: pointer;
-        margin-right: 5px;
-        font-size: 0.8em;
-        content: '❌';
+      .hiding-button {
+        display: inline-block;
       }
     }
 

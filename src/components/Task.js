@@ -19,7 +19,13 @@ class Task extends Component {
   }
 
   render() {
-    const { task, handleTaskChange, handleTaskDelete } = this.props;
+    const {
+      task,
+      handleTaskChange,
+      handleTaskDelete,
+      handleTaskEdit
+    } = this.props;
+
     return (
       <div className="row item-row">
         <span 
@@ -27,10 +33,13 @@ class Task extends Component {
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}>
           <span className="title">
-            <span
-              className="delete-button"
-              onClick={ () => { handleTaskDelete(task.name) } }></span>
             {task.name}
+            <i
+              className="hiding-button fa fa-pencil-square-o"
+              onClick={ () => { handleTaskEdit(task.name) } } />
+            <i
+              className="hiding-button fa fa-ban"
+              onClick={ () => { handleTaskDelete(task.name) } } />
           </span>
           <ElapsedTime 
             showPreciseTime={this.state.showPreciseTime}
