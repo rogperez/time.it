@@ -10,8 +10,6 @@
 # production
 /build
 
-/tmp
-
 /release
 
 # misc

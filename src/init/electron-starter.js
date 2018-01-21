@@ -1,10 +1,12 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const url = require('url')
 const menubar = require('menubar')
 
 let win;
-let mb = menubar();
+let mb = menubar({
+  icon: path.join(process.cwd(), 'tmp', 'TestClosedTemplate.png')
+});
 let debug = false;
 
 mb.on('ready', createMenuBar);
@@ -52,4 +54,12 @@ app.on('activate', () => {
   if (win === null) {
     createWindow();
   }
+});
+
+ipcMain.on('menubar-spin', (e, arg) => {
+  mb.setIcon(path.join(process.cwd(), 'tmp', 'TestOpenTemplate.png'))
+});
+
+ipcMain.on('menubar-wait', (e, arg) => {
+  mb.setIcon(path.join(process.cwd(), 'tmp', 'TestClosedTemplate.png'))
 });

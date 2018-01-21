@@ -332,6 +332,52 @@ describe('.start', () => {
   });
 });
 
+describe('.stop', () => {
+  let item1Name = 'foo';
+  let item2Name = 'bar';
+  let item3Name = 'baz';
+
+  beforeEach(() => {
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign(
+        { name: item1Name, selected: true },
+        DEFAULT_ITEM_DATA_STRUCTURE)
+    ));
+
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign(
+        { name: item2Name, selected: true },
+        DEFAULT_ITEM_DATA_STRUCTURE)
+    ));
+
+    localStorage.setItem(itemName, JSON.stringify(
+      Object.assign(
+        { name: item2Name, selected: true },
+        DEFAULT_ITEM_DATA_STRUCTURE)
+    ));
+  });
+
+  xit('sends the number of selected items to the menubar', () => {
+    jest.mock('./MenubarService');
+    const MenubarService = require('./MenubarService');
+    const mMock = jest.fn();
+    MenubarService.mockImplementation(() => {
+      return {
+        setSelectedTasks: mMock
+      };
+    });
+    TaskService.stop(item1Name);
+    expect(MenubarService.setSelectedTasks).toHaveBeenCalledWith(1);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(item1Name);
+    localStorage.removeItem(item2Name);
+    localStorage.removeItem(item3Name);
+    localStorage.removeItem(TaskService.taskCollectionKey);
+  })
+});
+
 describe('.stopAllTasks', () => {
   let startDate, endDate;
 

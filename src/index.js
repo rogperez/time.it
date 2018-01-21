@@ -6,9 +6,8 @@ import './styles/index.css';
 import 'font-awesome/css/font-awesome.css';
 
 if ("undefined" !== typeof window.require) {
-  const { ipcRenderer } = window.require('electron');
-  window.isElectron = true;
-}
+  window.electronEnvironment = true;
+} else window.electronEnvironment = false;
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

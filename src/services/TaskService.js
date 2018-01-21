@@ -1,4 +1,5 @@
 import AdditionalUtils from '../util/AdditionalUtils';
+import MenubarService from './MenubarService';
 
 const DEFAULT_ITEM_DATA = {
   elapsedTime: 0,
@@ -89,12 +90,22 @@ const refreshItemTime = (itemName) => {
 
 const stop = (itemName) => {
   setAttribute(itemName, 'selected', false);
+  sendStatsToMenubar();
   const item = setAttribute(itemName, 'end');
 }
 
 const start = (itemName) => {
   setAttribute(itemName, 'selected', true);
+  sendStatsToMenubar();
   return setAttribute(itemName, 'start');
+}
+
+const sendStatsToMenubar = () => {
+  let activeTasks = fetchAllTasks()
+    .filter(task => task.selected)
+    .length;
+
+  MenubarService.setSelectedTasks(activeTasks);
 }
 
 const fetchAllTasks = () => {

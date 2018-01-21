@@ -6,7 +6,7 @@
     "classnames": "^2.2.5",
     "electron-packager": "^10.1.1",
     "font-awesome": "^4.7.0",
-    "menubar": "^5.2.3",
+    "menubar": "git://github.com/rogperez/menubar#master",
     "moment": "^2.20.1",
     "node-sass-chokidar": "^0.0.3",
     "react": "^16.2.0",
