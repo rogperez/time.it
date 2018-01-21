@@ -55,7 +55,14 @@ const setAttribute = (itemName, attribute, value=new Date()) => {
       console.error('Date was not passed in. Cannot set this date');
       return false;
     }
-    itemFromStorage[attribute] = value.getTime();
+
+    if('start' === attribute) {
+      // TODO: fix this hack. Makes start time always seem like it's the very first
+      // time they ever started the timer.
+      itemFromStorage[attribute] = new Date().getTime() - itemFromStorage.elapsedTime;
+    } else if ('end' === attribute) {
+      itemFromStorage[attribute] = value.getTime();
+    }
   } else {
     itemFromStorage[attribute] = value;
   }
@@ -71,14 +78,18 @@ const getItemFromStorage = (itemName) => {
   );
 };
 
-const stop = (itemName) => {
-  setAttribute(itemName, 'selected', false);
-  const item = setAttribute(itemName, 'end');
+const refreshItemTime = (itemName) => {
+  const item = getItemFromStorage(itemName);
   return setAttribute(
     itemName,
     'elapsedTime',
-    item.elapsedTime + item.end - item.start
+    new Date().getTime() - item.start
   )
+}
+
+const stop = (itemName) => {
+  setAttribute(itemName, 'selected', false);
+  const item = setAttribute(itemName, 'end');
 }
 
 const start = (itemName) => {
@@ -107,8 +118,7 @@ const refreshTaskTime = (itemName) => {
   }
 
   if(getItemFromStorage(itemName).selected) {
-    stop(itemName);
-    start(itemName);
+    refreshItemTime(itemName);
   } else {
     return false;
   }

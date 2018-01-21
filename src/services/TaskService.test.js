@@ -255,7 +255,7 @@ describe('.start', () => {
       Object.assign({ name: itemName }, DEFAULT_ITEM_DATA_STRUCTURE)
     ));
 
-    date = new Date(1988, 10, 19);
+    date = new Date(1988, 10, 19, 0);
     MockDate.set(date)
   });
 
@@ -276,6 +276,37 @@ describe('.start', () => {
     );
   });
 
+  it('does not set the elapsed time back to 0', () => {
+    TaskService.start(itemName);
+
+    date = new Date(1988, 10, 19, 1); // 1 hour later
+    MockDate.set(date);
+
+    TaskService.refreshTaskTime(itemName);
+
+    let actualItem = () => {
+      return JSON.parse(localStorage.getItem(itemName));
+    }
+    let oneHour = 3600000;
+
+    expect(actualItem().elapsedTime)
+      .toEqual(oneHour);
+
+    TaskService.stop(itemName);
+    expect(actualItem().elapsedTime)
+      .toEqual(oneHour);
+    TaskService.start(itemName);
+
+    date = new Date(1988, 10, 19, 2); // 1 hour later
+    MockDate.set(date);
+
+    TaskService.refreshTaskTime(itemName);
+    TaskService.stop(itemName);
+
+    expect(actualItem().elapsedTime)
+      .toEqual(oneHour*2);
+  });
+
   it('sets the end time, selected false', () => {
     const beginningDate = new Date(2017, 0, 1);
     MockDate.set(beginningDate);
@@ -290,19 +321,8 @@ describe('.start', () => {
     const elapsedTime = endingDate - beginningDate;
 
     let actualItem = JSON.parse(localStorage.getItem(itemName));
-    expect(actualItem).toEqual(
-      Object.assign(
-        {},
-        DEFAULT_ITEM_DATA_STRUCTURE,
-        {
-          name: itemName,
-          elapsedTime: elapsedTime,
-          start: beginningDate.getTime(),
-          end: endingDate.getTime(),
-          selected: false
-        }
-      )
-    );
+    expect(actualItem.selected)
+      .toEqual(false);
   });
 
   afterEach(() => {
@@ -367,17 +387,8 @@ describe('.stopAllTasks', () => {
     TaskService.stopAllTasks();
 
     const elapsedTime = endDate - startDate;
-    expect(getItem('foo')).toEqual(
-      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
-        {
-          name: 'foo',
-          start: startDate.getTime(),
-          end: endDate.getTime(),
-          elapsedTime: elapsedTime,
-          selected: false
-        }
-      )
-    );
+    expect(getItem('foo').selected)
+      .toEqual(false);
     expect(getItem('bar')).toEqual(
       Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
         {
@@ -387,17 +398,8 @@ describe('.stopAllTasks', () => {
         }
       )
     );
-    expect(getItem('baz')).toEqual(
-      Object.assign( {}, DEFAULT_ITEM_DATA_STRUCTURE,
-        {
-          name: 'baz',
-          selected: false,
-          start: startDate.getTime(),
-          end: endDate.getTime(),
-          elapsedTime: elapsedTime
-        }
-      )
-    );
+    expect(getItem('baz').selected)
+      .toEqual(false);
   });
 });
 
@@ -425,7 +427,7 @@ describe('.refreshTaskTime', () => {
   });
 
   describe('task has started', () => {
-    it('resets the elapsed and end times', () => {
+    it('after a moment, resets the elapsed times', () => {
       TaskService.start(itemName);
 
       MockDate.set(endDate);
@@ -434,15 +436,39 @@ describe('.refreshTaskTime', () => {
       const item =
         JSON.parse(localStorage.getItem(itemName));
 
-      expect(item.end)
-        .toEqual(endDate.getTime());
       expect(item.start)
-        .toEqual(endDate.getTime());
+        .toEqual(startDate.getTime());
       expect(item.elapsedTime)
         .toEqual(endDate.getTime() - startDate.getTime());
     });
 
-    it('doesn\'t change dates if they\'re', () => {
+    it('after multiple moments, resets the elapsed times', () => {
+      TaskService.start(itemName);
+
+      MockDate.set(endDate);
+      TaskService.refreshTaskTime(itemName);
+
+      let item =
+        JSON.parse(localStorage.getItem(itemName));
+
+      expect(item.start)
+        .toEqual(startDate.getTime());
+      expect(item.elapsedTime)
+        .toEqual(endDate.getTime() - startDate.getTime());
+
+      const oldElapsedTime = item.elapsedTime;
+      const oneHour = 3600000;
+
+      MockDate.set(new Date(2000, 0, 1, 5)) // 1... hour... later
+      TaskService.refreshTaskTime(itemName);
+
+      item =
+        JSON.parse(localStorage.getItem(itemName));
+      expect(item.elapsedTime)
+        .toEqual(oldElapsedTime + oneHour);
+    });
+
+    it('doesn\'t change dates if they\'re not started', () => {
       TaskService.start(itemName);
 
       MockDate.set(endDate);
