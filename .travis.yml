@@ -1,0 +1,6 @@
+sudo: endabled
+install:
+  - ./bin/install_yarn.sh
+  - yarn install
+  - yarn run build-css
+script: yarn run test
