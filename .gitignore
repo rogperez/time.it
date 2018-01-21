@@ -10,6 +10,10 @@
 # production
 /build
 
+/tmp
+
+/release
+
 # misc
 .DS_Store
 .env.local
