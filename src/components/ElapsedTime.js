@@ -31,7 +31,7 @@ const ElapsedTime = ({ elapsedTime, showPreciseTime }) => {
 			minutes = Math.floor(elapsedSeconds / 60)
 			elapsedSeconds -= (minutes*60);
 		}
-		const seconds = elapsedSeconds.toFixed(2);
+		const seconds = Math.floor(elapsedSeconds);
 
 		return [
 			convertToString(hours),
